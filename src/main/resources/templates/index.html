@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test de inteligencia de Weill</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<main class="start-shell">
+    <section class="start-panel">
+        <p class="eyebrow">Test de inteligencia de Weill</p>
+        <h1>Registro del participante</h1>
+        <form class="start-form" method="post" action="/attempts">
+            <label>
+                Nombre
+                <input name="displayName" type="text" autocomplete="name" required maxlength="160" placeholder="Nombre del participante">
+            </label>
+            <label>
+                ID de usuario
+                <input name="externalUserId" type="text" maxlength="120" placeholder="Opcional">
+            </label>
+            <button type="submit">Iniciar prueba</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

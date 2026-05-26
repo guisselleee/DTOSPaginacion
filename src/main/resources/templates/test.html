@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test de Weill</title>
+    <link rel="stylesheet" href="/css/weill.css">
+    <script src="/js/weill-test.js" defer></script>
+</head>
+<body>
+<header class="app-header">
+    <div>
+        <p class="eyebrow">Participante</p>
+        <h1 th:text="${attempt.user.displayName}">Participante</h1>
+    </div>
+    <div class="progress-panel" aria-live="polite">
+        <span><strong data-answered-count>0</strong>/<span th:text="${totalItems}">60</span> respondidas</span>
+        <span>Máximo: <strong th:text="${totalItems}">60</strong></span>
+    </div>
+</header>
+
+<main class="test-shell" th:attr="data-attempt-id=${attempt.id},data-total-items=${totalItems}">
+    <section class="test-page" th:each="page : ${pages}">
+        <div class="page-heading">
+            <h2 th:text="'Página ' + ${page.pageNumber}">Página 1</h2>
+            <span>12 items</span>
+        </div>
+
+        <div class="item-grid">
+            <article class="test-item"
+                     th:each="item : ${page.items}"
+                     th:attr="data-page=${item.pageNumber},data-row=${item.rowNumber},data-item=${item.itemNumber}">
+                <div class="item-title">
+                    <h3 th:text="'Fila ' + ${item.rowNumber} + ' · Item ' + ${item.itemNumber}">Fila 1 · Item 1</h3>
+                    <output data-selection-label>Sin respuesta</output>
+                </div>
+
+                <div class="target-stage">
+                    <img class="target-image" th:src="${item.targetImagePath}" alt="Imagen principal del item">
+                    <div class="drop-zone" data-dropzone aria-label="Zona de respuesta"></div>
+                </div>
+
+                <div class="option-tray" aria-label="Opciones de respuesta">
+                    <button class="option-tile"
+                            type="button"
+                            th:each="option : ${item.options}"
+                            th:attr="data-option=${option.optionNumber}"
+                            th:aria-label="'Opción ' + ${option.optionNumber}">
+                        <img th:src="${option.imagePath}" alt="">
+                        <span th:text="${option.optionNumber}">1</span>
+                    </button>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <div class="action-bar">
+        <p data-status-message>Arrastra cada opción al recuadro punteado.</p>
+        <div class="action-buttons">
+            <button type="button" class="secondary-action" data-save-progress>Guardar progreso</button>
+            <button type="button" class="primary-action" data-finish-test>Finalizar y calificar</button>
+        </div>
+    </div>
+</main>
+</body>
+</html>

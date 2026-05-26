@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Resultados del test de Weill</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<main class="results-shell">
+    <section class="results-summary">
+        <p class="eyebrow">Resultado</p>
+        <h1 th:text="${result.attempt.user.displayName}">Participante</h1>
+        <p class="score-line">
+            <strong th:text="${result.attempt.totalScore}">0</strong>
+            <span th:text="'/' + ${maxScore} + ' puntos'"></span>
+        </p>
+        <p th:text="${result.answeredItems} + ' respuestas registradas'"></p>
+        <a class="secondary-link" href="/">Nueva prueba</a>
+    </section>
+
+    <section class="response-table-section">
+        <h2>Detalle</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Página</th>
+                    <th>Fila</th>
+                    <th>Item</th>
+                    <th>Seleccionada</th>
+                    <th>Correcta</th>
+                    <th>Punto</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="response : ${result.responses}">
+                    <td th:text="${response.pageNumber}">1</td>
+                    <td th:text="${response.rowNumber}">1</td>
+                    <td th:text="${response.itemNumber}">1</td>
+                    <td th:text="${response.selectedOption}">1</td>
+                    <td th:text="${response.correctOption}">1</td>
+                    <td>
+                        <span th:classappend="${response.correct} ? ' good' : ' bad'"
+                              class="score-badge"
+                              th:text="${response.score}">0</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>
