@@ -14,6 +14,7 @@
     let dragState = null;
     let animationFrame = 0;
 
+    document.querySelectorAll('.option-tile img').forEach(image => image.draggable = false);
     document.addEventListener('pointerdown', beginDrag);
     document.addEventListener('pointermove', moveDrag);
     document.addEventListener('pointerup', endDrag);
@@ -27,15 +28,18 @@
             return;
         }
         event.preventDefault();
+        tile.setPointerCapture?.(event.pointerId);
         const item = tile.closest('.test-item');
         dragState = {
             tile,
             item,
             option: Number(tile.dataset.option),
+            imageSrc: tile.querySelector('img')?.currentSrc || tile.querySelector('img')?.src,
             x: event.clientX,
             y: event.clientY,
             ghost: createGhost(tile)
         };
+        tile.classList.add('is-dragging');
         document.body.appendChild(dragState.ghost);
         positionGhost();
     }
@@ -61,7 +65,7 @@
         }
         const dropZone = dropZoneAt(event.clientX, event.clientY);
         if (dropZone && dropZone.closest('.test-item') === dragState.item) {
-            selectOption(dragState.item, dragState.option);
+            selectOption(dragState.item, dragState.option, dragState.imageSrc);
         }
         cleanupDrag();
     }
@@ -71,9 +75,19 @@
     }
 
     function createGhost(tile) {
-        const ghost = tile.cloneNode(true);
-        ghost.className = 'drag-ghost';
-        ghost.removeAttribute('type');
+        const ghost = document.createElement('div');
+        ghost.className = 'drag-ghost is-visible';
+        ghost.setAttribute('aria-hidden', 'true');
+
+        const image = tile.querySelector('img')?.cloneNode(true);
+        const label = tile.querySelector('span')?.cloneNode(true);
+        if (image) {
+            image.draggable = false;
+            ghost.appendChild(image);
+        }
+        if (label) {
+            ghost.appendChild(label);
+        }
         return ghost;
     }
 
@@ -81,7 +95,8 @@
         if (!dragState) {
             return;
         }
-        dragState.ghost.style.transform = `translate3d(${dragState.x + 12}px, ${dragState.y + 12}px, 0)`;
+        dragState.ghost.style.left = (dragState.x + 14) + 'px';
+        dragState.ghost.style.top = (dragState.y + 14) + 'px';
     }
 
     function updateHotDropZone() {
@@ -113,11 +128,12 @@
             animationFrame = 0;
         }
         document.querySelectorAll('.drop-zone.is-hot').forEach(zone => zone.classList.remove('is-hot'));
+        dragState?.tile?.classList.remove('is-dragging');
         dragState?.ghost?.remove();
         dragState = null;
     }
 
-    function selectOption(item, option) {
+    function selectOption(item, option, imageSrc) {
         const key = itemKey(item);
         selections.set(key, {
             pageNumber: Number(item.dataset.page),
@@ -128,9 +144,26 @@
         item.querySelectorAll('.option-tile').forEach(tile => {
             tile.classList.toggle('is-selected', Number(tile.dataset.option) === option);
         });
-        item.querySelector('[data-dropzone]').classList.add('has-answer');
+        renderPlacedAnswer(item.querySelector('[data-dropzone]'), option, imageSrc);
         item.querySelector('[data-selection-label]').textContent = `Opción ${option}`;
         updateProgress();
+    }
+
+    function renderPlacedAnswer(dropZone, option, imageSrc) {
+        dropZone.classList.add('has-answer');
+        dropZone.replaceChildren();
+
+        const image = document.createElement('img');
+        image.className = 'placed-answer-image';
+        image.src = imageSrc;
+        image.alt = `Opción ${option} seleccionada`;
+        image.draggable = false;
+
+        const badge = document.createElement('span');
+        badge.className = 'placed-answer-badge';
+        badge.textContent = option;
+
+        dropZone.append(image, badge);
     }
 
     function itemKey(item) {
