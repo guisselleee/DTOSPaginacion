@@ -6,4 +6,8 @@ import java.util.Optional;
 
 public interface WeillUserRepository extends JpaRepository<WeillUser, Long> {
     Optional<WeillUser> findByExternalUserId(String externalUserId);
+
+    boolean existsByEmailIgnoreCase(String email);
+
+    Optional<WeillUser> findByEmailIgnoreCase(String email);
 }
