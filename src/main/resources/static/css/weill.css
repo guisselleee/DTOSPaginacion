@@ -227,6 +227,24 @@ p {
     margin-bottom: 34px;
 }
 
+.single-test-card {
+    width: min(760px, 100%);
+    margin: 0 auto;
+}
+
+.single-item-frame .test-item {
+    display: none;
+}
+
+.single-item-frame .test-item.is-active {
+    display: block;
+}
+
+.test-shell.is-busy .option-tile {
+    cursor: wait;
+    pointer-events: none;
+}
+
 .page-heading {
     display: flex;
     align-items: baseline;

@@ -15,21 +15,22 @@
     </div>
     <div class="progress-panel" aria-live="polite">
         <span><strong data-answered-count>0</strong>/<span th:text="${totalItems}">60</span> respondidas</span>
-        <span>Máximo: <strong th:text="${totalItems}">60</strong></span>
+        <span>Puntaje: <strong data-current-score>0</strong>/<strong th:text="${totalItems}">60</strong></span>
     </div>
 </header>
 
 <main class="test-shell" th:attr="data-attempt-id=${attempt.id},data-total-items=${totalItems}">
-    <section class="test-page" th:each="page : ${pages}">
+    <section class="single-test-card" aria-live="polite">
         <div class="page-heading">
-            <h2 th:text="'Página ' + ${page.pageNumber}">Página 1</h2>
-            <span>12 items</span>
+            <h2 data-current-title>Prueba 1</h2>
+            <span><strong data-current-item>1</strong>/<span th:text="${totalItems}">60</span></span>
         </div>
 
-        <div class="item-grid">
-            <article class="test-item"
-                     th:each="item : ${page.items}"
-                     th:attr="data-page=${item.pageNumber},data-row=${item.rowNumber},data-item=${item.itemNumber}">
+        <div class="single-item-frame" data-test-items>
+            <th:block th:each="page : ${pages}">
+                <article class="test-item"
+                         th:each="item : ${page.items}"
+                         th:attr="data-page=${item.pageNumber},data-row=${item.rowNumber},data-item=${item.itemNumber}">
                 <div class="item-title">
                     <h3 th:text="'Fila ' + ${item.rowNumber} + ' · Item ' + ${item.itemNumber}">Fila 1 · Item 1</h3>
                     <output data-selection-label>Sin respuesta</output>
@@ -50,14 +51,14 @@
                         <span th:text="${option.optionNumber}">1</span>
                     </button>
                 </div>
-            </article>
+                </article>
+            </th:block>
         </div>
     </section>
 
     <div class="action-bar">
-        <p data-status-message>Arrastra cada opción al recuadro punteado.</p>
+        <p data-status-message>Arrastra una opción al recuadro punteado para registrar la respuesta.</p>
         <div class="action-buttons">
-            <button type="button" class="secondary-action" data-save-progress>Guardar progreso</button>
             <button type="button" class="primary-action" data-finish-test>Finalizar y calificar</button>
         </div>
     </div>

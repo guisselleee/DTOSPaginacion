@@ -6,30 +6,39 @@
 
     const attemptId = shell.dataset.attemptId;
     const totalItems = Number(shell.dataset.totalItems);
+    const items = Array.from(document.querySelectorAll('[data-test-items] .test-item'));
     const selections = new Map();
     const answeredCount = document.querySelector('[data-answered-count]');
+    const currentScore = document.querySelector('[data-current-score]');
+    const currentItem = document.querySelector('[data-current-item]');
+    const currentTitle = document.querySelector('[data-current-title]');
     const statusMessage = document.querySelector('[data-status-message]');
-    const saveButton = document.querySelector('[data-save-progress]');
     const finishButton = document.querySelector('[data-finish-test]');
     let dragState = null;
     let animationFrame = 0;
+    let activeIndex = 0;
+    let busy = false;
 
     document.querySelectorAll('.option-tile img').forEach(image => image.draggable = false);
+    showActiveItem();
     document.addEventListener('pointerdown', beginDrag);
     document.addEventListener('pointermove', moveDrag);
     document.addEventListener('pointerup', endDrag);
     document.addEventListener('pointercancel', cancelDrag);
-    saveButton.addEventListener('click', saveProgress);
     finishButton.addEventListener('click', finishTest);
+    finishButton.disabled = true;
 
     function beginDrag(event) {
         const tile = event.target.closest('.option-tile');
-        if (!tile || !shell.contains(tile)) {
+        if (busy || !tile || !shell.contains(tile)) {
             return;
         }
         event.preventDefault();
         tile.setPointerCapture?.(event.pointerId);
         const item = tile.closest('.test-item');
+        if (!item?.classList.contains('is-active')) {
+            return;
+        }
         dragState = {
             tile,
             item,
@@ -65,7 +74,7 @@
         }
         const dropZone = dropZoneAt(event.clientX, event.clientY);
         if (dropZone && dropZone.closest('.test-item') === dragState.item) {
-            selectOption(dragState.item, dragState.option, dragState.imageSrc);
+            void selectOption(dragState.item, dragState.option, dragState.imageSrc);
         }
         cleanupDrag();
     }
@@ -133,20 +142,31 @@
         dragState = null;
     }
 
-    function selectOption(item, option, imageSrc) {
+    async function selectOption(item, option, imageSrc) {
         const key = itemKey(item);
-        selections.set(key, {
+        const response = {
             pageNumber: Number(item.dataset.page),
             rowNumber: Number(item.dataset.row),
             itemNumber: Number(item.dataset.item),
             selectedOption: option
-        });
+        };
         item.querySelectorAll('.option-tile').forEach(tile => {
             tile.classList.toggle('is-selected', Number(tile.dataset.option) === option);
         });
         renderPlacedAnswer(item.querySelector('[data-dropzone]'), option, imageSrc);
         item.querySelector('[data-selection-label]').textContent = `Opción ${option}`;
-        updateProgress();
+        setStatus('Guardando respuesta...');
+
+        try {
+            const result = await postResponses(`/api/attempts/${attemptId}/responses`, [response]);
+            selections.set(key, response);
+            updateProgress(result);
+            advanceAfterSave();
+        } catch (error) {
+            clearPlacedAnswer(item);
+            updateProgress();
+            setStatus('No se pudo guardar la respuesta. Intenta arrastrarla de nuevo.');
+        }
     }
 
     function renderPlacedAnswer(dropZone, option, imageSrc) {
@@ -166,21 +186,47 @@
         dropZone.append(image, badge);
     }
 
+    function clearPlacedAnswer(item) {
+        item.querySelectorAll('.option-tile').forEach(tile => tile.classList.remove('is-selected'));
+        const dropZone = item.querySelector('[data-dropzone]');
+        dropZone.classList.remove('has-answer');
+        dropZone.replaceChildren();
+        item.querySelector('[data-selection-label]').textContent = 'Sin respuesta';
+    }
+
     function itemKey(item) {
         return `${item.dataset.page}:${item.dataset.row}:${item.dataset.item}`;
     }
 
-    function updateProgress() {
-        answeredCount.textContent = selections.size;
+    function updateProgress(result) {
+        answeredCount.textContent = result?.answeredItems ?? selections.size;
+        if (currentScore) {
+            currentScore.textContent = result?.currentScore ?? currentScore.textContent;
+        }
     }
 
-    async function saveProgress() {
-        if (selections.size === 0) {
-            setStatus('No hay respuestas para guardar todavía.');
+    function showActiveItem() {
+        items.forEach((item, index) => {
+            item.classList.toggle('is-active', index === activeIndex);
+        });
+        const activeItem = items[activeIndex];
+        if (!activeItem) {
             return;
         }
-        const result = await postResponses(`/api/attempts/${attemptId}/responses`);
-        setStatus(`${result.answeredItems}/${result.totalItems} respuestas guardadas.`);
+        currentItem.textContent = activeIndex + 1;
+        currentTitle.textContent = `Prueba ${activeIndex + 1}`;
+        const itemLabel = activeItem.querySelector('.item-title h3')?.textContent;
+        setStatus(`${itemLabel}. Arrastra una opción al recuadro punteado.`);
+    }
+
+    function advanceAfterSave() {
+        if (activeIndex < items.length - 1) {
+            activeIndex += 1;
+            showActiveItem();
+            return;
+        }
+        finishButton.disabled = false;
+        setStatus('Todas las respuestas fueron registradas. Puedes finalizar y calificar.');
     }
 
     async function finishTest() {
@@ -189,33 +235,35 @@
             setStatus(`Faltan ${missing} respuestas antes de finalizar.`);
             return;
         }
-        const result = await postResponses(`/api/attempts/${attemptId}/complete`);
-        window.location.assign(result.resultsUrl);
+        try {
+            const result = await postResponses(`/api/attempts/${attemptId}/complete`, Array.from(selections.values()));
+            window.location.assign(result.resultsUrl);
+        } catch (error) {
+            setStatus('No se pudo finalizar. Revisa la conexión e intenta de nuevo.');
+        }
     }
 
-    async function postResponses(url) {
+    async function postResponses(url, responses) {
         setBusy(true);
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({responses: Array.from(selections.values())})
+                body: JSON.stringify({responses})
             });
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             return await response.json();
-        } catch (error) {
-            setStatus('No se pudo guardar. Revisa la conexión e intenta de nuevo.');
-            throw error;
         } finally {
             setBusy(false);
         }
     }
 
-    function setBusy(busy) {
-        saveButton.disabled = busy;
-        finishButton.disabled = busy;
+    function setBusy(nextBusy) {
+        busy = nextBusy;
+        shell.classList.toggle('is-busy', busy);
+        finishButton.disabled = busy || selections.size < totalItems;
     }
 
     function setStatus(message) {
