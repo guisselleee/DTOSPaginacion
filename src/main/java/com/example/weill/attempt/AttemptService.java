@@ -37,6 +37,11 @@ public class AttemptService {
         return attemptRepository.save(new WeillTestAttempt(user));
     }
 
+    @Transactional
+    public WeillTestAttempt startAttempt(WeillUser user) {
+        return attemptRepository.save(new WeillTestAttempt(user));
+    }
+
     @Transactional(readOnly = true)
     public WeillTestAttempt getAttempt(long attemptId) {
         return attemptRepository.findById(attemptId)

@@ -10,18 +10,30 @@
 <main class="start-shell">
     <section class="start-panel">
         <p class="eyebrow">Test de inteligencia de Weill</p>
-        <h1>Registro del participante</h1>
-        <form class="start-form" method="post" action="/attempts">
-            <label>
-                Nombre
-                <input name="displayName" type="text" autocomplete="name" required maxlength="160" placeholder="Nombre del participante">
-            </label>
-            <label>
-                ID de usuario
-                <input name="externalUserId" type="text" maxlength="120" placeholder="Opcional">
-            </label>
-            <button type="submit">Iniciar prueba</button>
-        </form>
+        <h1 th:text="'Hola, ' + ${user.displayName}">Hola, participante</h1>
+        <p class="lead-copy">Cuando estés listo, inicia una nueva prueba.</p>
+        <dl class="user-summary">
+            <div>
+                <dt>Correo</dt>
+                <dd th:text="${user.email}">correo@ejemplo.com</dd>
+            </div>
+            <div>
+                <dt>Centro escolar</dt>
+                <dd th:text="${user.schoolCenter ?: 'No registrado'}">No registrado</dd>
+            </div>
+            <div>
+                <dt>Municipio</dt>
+                <dd th:text="${user.municipality ?: 'No registrado'}">No registrado</dd>
+            </div>
+        </dl>
+        <div class="form-actions">
+            <form method="post" action="/attempts">
+                <button class="primary-action" type="submit">Iniciar prueba</button>
+            </form>
+            <form method="post" action="/logout">
+                <button class="secondary-action" type="submit">Salir</button>
+            </form>
+        </div>
     </section>
 </main>
 </body>

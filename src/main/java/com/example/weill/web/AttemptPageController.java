@@ -4,35 +4,45 @@ import com.example.weill.attempt.AttemptResultView;
 import com.example.weill.attempt.AttemptService;
 import com.example.weill.attempt.WeillTestAttempt;
 import com.example.weill.test.WeillTestCatalog;
+import com.example.weill.user.UserService;
+import com.example.weill.user.WeillUser;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AttemptPageController {
 
     private final AttemptService attemptService;
     private final WeillTestCatalog catalog;
+    private final UserService userService;
 
-    public AttemptPageController(AttemptService attemptService, WeillTestCatalog catalog) {
+    public AttemptPageController(AttemptService attemptService, WeillTestCatalog catalog, UserService userService) {
         this.attemptService = attemptService;
         this.catalog = catalog;
+        this.userService = userService;
     }
 
     @GetMapping("/")
-    public String index() {
+    public String index(HttpSession session, Model model) {
+        WeillUser user = currentUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("user", user);
         return "index";
     }
 
     @PostMapping("/attempts")
-    public String createAttempt(
-        @RequestParam String displayName,
-        @RequestParam(required = false) String externalUserId
-    ) {
-        WeillTestAttempt attempt = attemptService.startAttempt(displayName, externalUserId);
+    public String createAttempt(HttpSession session) {
+        WeillUser user = currentUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
+        WeillTestAttempt attempt = attemptService.startAttempt(user);
         return "redirect:/attempts/" + attempt.getId() + "/test";
     }
 
@@ -50,5 +60,13 @@ public class AttemptPageController {
         model.addAttribute("result", result);
         model.addAttribute("maxScore", catalog.totalItems());
         return "results";
+    }
+
+    private WeillUser currentUser(HttpSession session) {
+        Object userId = session.getAttribute(AuthController.SESSION_USER_ID);
+        if (userId instanceof Long id) {
+            return userService.getUser(id);
+        }
+        return null;
     }
 }

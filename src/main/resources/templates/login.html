@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ingresar al test de Weill</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<main class="start-shell">
+    <section class="start-panel">
+        <p class="eyebrow">Test de inteligencia de Weill</p>
+        <h1>Ingreso</h1>
+        <p class="lead-copy">Ingresa con el correo electrónico registrado.</p>
+        <p class="form-error" th:if="${error}" th:text="${error}">Error</p>
+        <form class="start-form" method="post" action="/login">
+            <label>
+                Correo electrónico
+                <input name="email"
+                       type="email"
+                       autocomplete="email"
+                       required
+                       maxlength="254"
+                       placeholder="correo@ejemplo.com"
+                       th:value="${email}">
+            </label>
+            <button type="submit">Entrar</button>
+        </form>
+        <p class="form-footer">
+            ¿Nuevo usuario?
+            <a href="/register">Crear registro</a>
+        </p>
+    </section>
+</main>
+</body>
+</html>
