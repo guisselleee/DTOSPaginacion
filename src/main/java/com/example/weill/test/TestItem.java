@@ -8,6 +8,7 @@ public record TestItem(
     int itemNumber,
     int correctOption,
     String targetImagePath,
+    DropZoneBounds dropZone,
     List<OptionImage> options
 ) {
     public String key() {

@@ -22,6 +22,12 @@ public class WeillTestCatalog {
         {7, 3, 2}
     };
 
+    private final DropZoneDetector dropZoneDetector;
+
+    public WeillTestCatalog(DropZoneDetector dropZoneDetector) {
+        this.dropZoneDetector = dropZoneDetector;
+    }
+
     public List<TestPage> pages() {
         List<TestPage> pages = new ArrayList<>();
         for (int page = 1; page <= PAGE_COUNT; page++) {
@@ -50,6 +56,7 @@ public class WeillTestCatalog {
             itemNumber,
             correctOption(pageNumber, rowNumber, itemNumber),
             imageDirectory + "/main.jpg",
+            dropZoneDetector.detect(imageDirectory + "/main.jpg"),
             optionImages(imageDirectory)
         );
     }

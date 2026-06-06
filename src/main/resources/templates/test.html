@@ -38,7 +38,10 @@
 
                 <div class="target-stage">
                     <img class="target-image" th:src="${item.targetImagePath}" alt="Imagen principal del item">
-                    <div class="drop-zone" data-dropzone aria-label="Zona de respuesta"></div>
+                    <div class="drop-zone"
+                         data-dropzone
+                         aria-label="Zona de respuesta"
+                         th:style="'left:' + ${item.dropZone.left} + '%;top:' + ${item.dropZone.top} + '%;width:' + ${item.dropZone.width} + '%;height:' + ${item.dropZone.height} + '%'"></div>
                 </div>
 
                 <div class="option-tray" aria-label="Opciones de respuesta">
