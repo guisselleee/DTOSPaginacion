@@ -1,5 +1,7 @@
 package com.example.weill.web;
 
+import com.example.weill.audit.AuditEventType;
+import com.example.weill.audit.AuditService;
 import com.example.weill.user.DuplicateEmailException;
 import com.example.weill.user.InvalidUserFormException;
 import com.example.weill.user.UserRegistrationForm;
@@ -23,9 +25,11 @@ public class AuthController {
     public static final String SESSION_USER_ID = "userId";
 
     private final UserService userService;
+    private final AuditService auditService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, AuditService auditService) {
         this.userService = userService;
+        this.auditService = auditService;
     }
 
     @GetMapping("/login")
@@ -53,6 +57,14 @@ public class AuthController {
 
             request.changeSessionId();
             session.setAttribute(SESSION_USER_ID, user.get().getId());
+            auditService.bindActorToSession(session, user.get());
+            auditService.record(
+                AuditEventType.LOGIN,
+                user.get(),
+                null,
+                request,
+                "Inicio de sesión de usuario."
+            );
             return "redirect:/";
         } catch (InvalidUserFormException exception) {
             redirectAttributes.addFlashAttribute("email", email);
@@ -80,6 +92,14 @@ public class AuthController {
             WeillUser user = userService.register(registration);
             request.changeSessionId();
             session.setAttribute(SESSION_USER_ID, user.getId());
+            auditService.bindActorToSession(session, user);
+            auditService.record(
+                AuditEventType.LOGIN,
+                user,
+                null,
+                request,
+                "Inicio de sesión posterior al registro."
+            );
             return "redirect:/";
         } catch (DuplicateEmailException exception) {
             redirectAttributes.addFlashAttribute("registration", registration);
@@ -94,6 +114,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public String logout(HttpSession session) {
+        auditService.markExplicitClose(session);
         session.invalidate();
         return "redirect:/login";
     }

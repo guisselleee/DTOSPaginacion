@@ -1,10 +1,13 @@
 package com.example.weill.web;
 
+import com.example.weill.audit.AuditEventType;
+import com.example.weill.audit.AuditService;
 import com.example.weill.attempt.AttemptService;
 import com.example.weill.attempt.CompleteAttemptResult;
 import com.example.weill.attempt.SaveResponsesRequest;
 import com.example.weill.attempt.SaveResponsesResult;
 import com.example.weill.user.WeillUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +26,16 @@ public class AttemptApiController {
 
     private final AttemptService attemptService;
     private final SessionUserService sessionUserService;
+    private final AuditService auditService;
 
-    public AttemptApiController(AttemptService attemptService, SessionUserService sessionUserService) {
+    public AttemptApiController(
+        AttemptService attemptService,
+        SessionUserService sessionUserService,
+        AuditService auditService
+    ) {
         this.attemptService = attemptService;
         this.sessionUserService = sessionUserService;
+        this.auditService = auditService;
     }
 
     @PostMapping("/{attemptId}/responses")
@@ -42,11 +51,21 @@ public class AttemptApiController {
     @PostMapping("/{attemptId}/complete")
     public ResponseEntity<CompleteAttemptResult> completeAttempt(
         @PathVariable long attemptId,
+        HttpServletRequest servletRequest,
         HttpSession session,
         @RequestBody SaveResponsesRequest request
     ) {
         WeillUser user = requireRegularUser(session);
-        return ResponseEntity.ok(attemptService.completeAttempt(attemptId, user.getId(), responsesFrom(request)));
+        CompleteAttemptResult result =
+            attemptService.completeAttempt(attemptId, user.getId(), responsesFrom(request));
+        auditService.record(
+            AuditEventType.EVALUATION_COMPLETED,
+            user,
+            attemptId,
+            servletRequest,
+            "Evaluación finalizada con " + result.totalScore() + "/" + result.maxScore() + " aciertos."
+        );
+        return ResponseEntity.ok(result);
     }
 
     private List<com.example.weill.attempt.ResponseSubmission> responsesFrom(SaveResponsesRequest request) {

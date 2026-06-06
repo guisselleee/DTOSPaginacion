@@ -1,5 +1,7 @@
 package com.example.weill.web;
 
+import com.example.weill.audit.AuditEventType;
+import com.example.weill.audit.AuditService;
 import com.example.weill.attempt.AttemptResultView;
 import com.example.weill.attempt.AttemptService;
 import com.example.weill.attempt.WeillTestAttempt;
@@ -7,6 +9,7 @@ import com.example.weill.norms.PsychometricResult;
 import com.example.weill.norms.WeillPsychometricEngine;
 import com.example.weill.test.WeillTestCatalog;
 import com.example.weill.user.WeillUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,17 +24,20 @@ public class AttemptPageController {
     private final WeillTestCatalog catalog;
     private final SessionUserService sessionUserService;
     private final WeillPsychometricEngine psychometricEngine;
+    private final AuditService auditService;
 
     public AttemptPageController(
         AttemptService attemptService,
         WeillTestCatalog catalog,
         SessionUserService sessionUserService,
-        WeillPsychometricEngine psychometricEngine
+        WeillPsychometricEngine psychometricEngine,
+        AuditService auditService
     ) {
         this.attemptService = attemptService;
         this.catalog = catalog;
         this.sessionUserService = sessionUserService;
         this.psychometricEngine = psychometricEngine;
+        this.auditService = auditService;
     }
 
     @GetMapping("/")
@@ -48,7 +54,7 @@ public class AttemptPageController {
     }
 
     @PostMapping("/attempts")
-    public String createAttempt(HttpSession session) {
+    public String createAttempt(HttpServletRequest request, HttpSession session) {
         WeillUser user = currentUser(session);
         if (user == null) {
             return "redirect:/login";
@@ -57,6 +63,13 @@ public class AttemptPageController {
             return "redirect:/admin";
         }
         WeillTestAttempt attempt = attemptService.startAttempt(user);
+        auditService.record(
+            AuditEventType.EVALUATION_STARTED,
+            user,
+            attempt.getId(),
+            request,
+            "Evaluación iniciada."
+        );
         return "redirect:/attempts/" + attempt.getId() + "/test";
     }
 
@@ -90,7 +103,12 @@ public class AttemptPageController {
     }
 
     @GetMapping("/attempts/{attemptId}/results")
-    public String results(@PathVariable long attemptId, HttpSession session, Model model) {
+    public String results(
+        @PathVariable long attemptId,
+        HttpServletRequest request,
+        HttpSession session,
+        Model model
+    ) {
         WeillUser user = currentRegularUser(session);
         if (user == null) {
             return redirectForCurrentSession(session);
@@ -107,6 +125,13 @@ public class AttemptPageController {
         model.addAttribute("result", result);
         model.addAttribute("psychometric", psychometricResult);
         model.addAttribute("maxScore", catalog.totalItems());
+        auditService.record(
+            AuditEventType.RESULT_VIEWED,
+            user,
+            attemptId,
+            request,
+            "El participante consultó sus resultados."
+        );
         return "results";
     }
 
