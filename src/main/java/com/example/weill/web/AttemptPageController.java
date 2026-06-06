@@ -50,6 +50,7 @@ public class AttemptPageController {
             return redirectForRole(user);
         }
         model.addAttribute("user", user);
+        model.addAttribute("existingAttempt", attemptService.attemptForUser(user.getId()).orElse(null));
         return "index";
     }
 
@@ -62,7 +63,16 @@ public class AttemptPageController {
         if (!user.isEvaluatedUser()) {
             return redirectForRole(user);
         }
+        var existingAttempt = attemptService.attemptForUser(user.getId());
+        if (existingAttempt.isPresent()) {
+            WeillTestAttempt attempt = existingAttempt.get();
+            String destination = attempt.isCompleted() ? "results" : "test";
+            return "redirect:/attempts/" + attempt.getId() + "/" + destination;
+        }
         WeillTestAttempt attempt = attemptService.startAttempt(user);
+        if (attempt.isCompleted()) {
+            return "redirect:/attempts/" + attempt.getId() + "/results";
+        }
         auditService.record(
             AuditEventType.EVALUATION_STARTED,
             user,
@@ -82,7 +92,15 @@ public class AttemptPageController {
         if (!user.isEvaluatedUser()) {
             return redirectForRole(user);
         }
-        model.addAttribute("attempt", attemptService.getAttemptForUser(attemptId, user.getId()));
+        WeillTestAttempt attempt = attemptService.getAttemptForUser(attemptId, user.getId());
+        WeillTestAttempt existingAttempt = attemptService.attemptForUser(user.getId()).orElse(attempt);
+        if (existingAttempt.isCompleted()) {
+            return "redirect:/attempts/" + existingAttempt.getId() + "/results";
+        }
+        if (!existingAttempt.getId().equals(attempt.getId())) {
+            return "redirect:/attempts/" + existingAttempt.getId() + "/test";
+        }
+        model.addAttribute("attempt", attempt);
         model.addAttribute("pages", catalog.pages());
         model.addAttribute("totalItems", catalog.totalItems());
         return "test";

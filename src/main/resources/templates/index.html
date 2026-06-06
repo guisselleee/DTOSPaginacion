@@ -11,7 +11,15 @@
     <section class="start-panel">
         <p class="eyebrow">Test de inteligencia de Weill</p>
         <h1 th:text="'Hola, ' + ${user.displayName}">Hola, participante</h1>
-        <p class="lead-copy">Cuando estés listo, inicia una nueva prueba.</p>
+        <p class="lead-copy" th:if="${existingAttempt == null}">
+            Cuando estés listo, inicia la prueba.
+        </p>
+        <p class="lead-copy" th:if="${existingAttempt != null and !existingAttempt.completed}">
+            Tienes una evaluación en curso. Puedes continuar desde donde la dejaste.
+        </p>
+        <p class="lead-copy" th:if="${existingAttempt != null and existingAttempt.completed}">
+            Ya completaste la evaluación. Cada evaluado puede realizarla una sola vez.
+        </p>
         <dl class="user-summary">
             <div>
                 <dt>Correo</dt>
@@ -27,9 +35,16 @@
             </div>
         </dl>
         <div class="form-actions">
-            <form method="post" action="/attempts">
+            <form method="post" action="/attempts"
+                  th:if="${existingAttempt == null}">
                 <button class="primary-action" type="submit">Iniciar prueba</button>
             </form>
+            <a class="primary-action"
+               th:if="${existingAttempt != null and !existingAttempt.completed}"
+               th:href="@{/attempts/{id}/test(id=${existingAttempt.id})}">Continuar prueba</a>
+            <a class="primary-action"
+               th:if="${existingAttempt != null and existingAttempt.completed}"
+               th:href="@{/attempts/{id}/results(id=${existingAttempt.id})}">Consultar resultado</a>
             <form method="post" action="/logout">
                 <button class="secondary-action" type="submit">Salir</button>
             </form>

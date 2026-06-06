@@ -17,6 +17,9 @@ public interface WeillTestAttemptRepository extends JpaRepository<WeillTestAttem
     @EntityGraph(attributePaths = "user")
     Optional<WeillTestAttempt> findByIdAndUser_Id(Long id, Long userId);
 
+    @EntityGraph(attributePaths = "user")
+    Optional<WeillTestAttempt> findFirstByUser_IdOrderByStartedAtDesc(Long userId);
+
     @Query("""
         select attempt
         from WeillTestAttempt attempt

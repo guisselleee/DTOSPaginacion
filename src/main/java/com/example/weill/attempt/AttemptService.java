@@ -34,12 +34,15 @@ public class AttemptService {
         String normalizedName = normalizeDisplayName(displayName);
         String normalizedExternalId = normalizeExternalId(externalUserId);
         WeillUser user = resolveUser(normalizedName, normalizedExternalId);
-        return attemptRepository.save(new WeillTestAttempt(user));
+        return startAttempt(user);
     }
 
     @Transactional
     public WeillTestAttempt startAttempt(WeillUser user) {
-        return attemptRepository.save(new WeillTestAttempt(user));
+        WeillUser lockedUser = userRepository.findByIdForUpdate(user.getId())
+            .orElseThrow(() -> new EntityNotFoundException("User not found: " + user.getId()));
+        return attemptRepository.findFirstByUser_IdOrderByStartedAtDesc(lockedUser.getId())
+            .orElseGet(() -> attemptRepository.save(new WeillTestAttempt(lockedUser)));
     }
 
     @Transactional(readOnly = true)
@@ -94,6 +97,11 @@ public class AttemptService {
     public WeillTestAttempt getAttemptForUser(long attemptId, long userId) {
         return attemptRepository.findByIdAndUser_Id(attemptId, userId)
             .orElseThrow(() -> new AttemptNotFoundException(attemptId));
+    }
+
+    @Transactional(readOnly = true)
+    public java.util.Optional<WeillTestAttempt> attemptForUser(long userId) {
+        return attemptRepository.findFirstByUser_IdOrderByStartedAtDesc(userId);
     }
 
     private void saveResponse(WeillTestAttempt attempt, ResponseSubmission submission) {

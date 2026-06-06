@@ -1,9 +1,11 @@
 package com.example.weill.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +19,10 @@ public interface WeillUserRepository extends JpaRepository<WeillUser, Long> {
     Optional<WeillUser> findByEmailIgnoreCaseAndRole(String email, UserRole role);
 
     List<WeillUser> findByRoleNotOrderByDisplayNameAsc(UserRole role);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select user from WeillUser user where user.id = :userId")
+    Optional<WeillUser> findByIdForUpdate(@Param("userId") Long userId);
 
     @Query("""
         select user
