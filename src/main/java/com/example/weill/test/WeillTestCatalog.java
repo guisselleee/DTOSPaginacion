@@ -43,13 +43,14 @@ public class WeillTestCatalog {
 
     public TestItem item(int pageNumber, int rowNumber, int itemNumber) {
         validateCoordinates(pageNumber, rowNumber, itemNumber);
+        String imageDirectory = imageDirectory(pageNumber, rowNumber, itemNumber);
         return new TestItem(
             pageNumber,
             rowNumber,
             itemNumber,
             correctOption(pageNumber, rowNumber, itemNumber),
-            "/images/weill/placeholders/target.svg",
-            optionImages(pageNumber, rowNumber, itemNumber)
+            imageDirectory + "/main.jpg",
+            optionImages(imageDirectory)
         );
     }
 
@@ -67,13 +68,22 @@ public class WeillTestCatalog {
         return MAX_SCORE;
     }
 
-    private List<OptionImage> optionImages(int pageNumber, int rowNumber, int itemNumber) {
+    private List<OptionImage> optionImages(String imageDirectory) {
         return IntStream.rangeClosed(1, OPTIONS_PER_ITEM)
             .mapToObj(option -> new OptionImage(
                 option,
-                "/images/weill/placeholders/option-" + option + ".svg"
+                imageDirectory + "/option_" + twoDigits(option) + ".jpg"
             ))
             .toList();
+    }
+
+    private String imageDirectory(int pageNumber, int rowNumber, int itemNumber) {
+        int itemOnPage = ((rowNumber - 1) * ITEMS_PER_ROW) + itemNumber;
+        return "/images/weill_images/page_" + pageNumber + "/item_" + twoDigits(itemOnPage);
+    }
+
+    private String twoDigits(int number) {
+        return String.format("%02d", number);
     }
 
     private void validateCoordinates(int pageNumber, int rowNumber, int itemNumber) {

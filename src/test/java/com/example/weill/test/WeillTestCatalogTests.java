@@ -30,6 +30,30 @@ class WeillTestCatalogTests {
     }
 
     @Test
+    void mapsItemsAndOptionsToTheirPageImageDirectories() {
+        TestItem firstItem = catalog.item(1, 1, 1);
+        assertThat(firstItem.targetImagePath())
+            .isEqualTo("/images/weill_images/page_1/item_01/main.jpg");
+        assertThat(firstItem.options())
+            .extracting(OptionImage::imagePath)
+            .containsExactly(
+                "/images/weill_images/page_1/item_01/option_01.jpg",
+                "/images/weill_images/page_1/item_01/option_02.jpg",
+                "/images/weill_images/page_1/item_01/option_03.jpg",
+                "/images/weill_images/page_1/item_01/option_04.jpg",
+                "/images/weill_images/page_1/item_01/option_05.jpg",
+                "/images/weill_images/page_1/item_01/option_06.jpg",
+                "/images/weill_images/page_1/item_01/option_07.jpg",
+                "/images/weill_images/page_1/item_01/option_08.jpg"
+            );
+
+        assertThat(catalog.item(3, 2, 2).targetImagePath())
+            .isEqualTo("/images/weill_images/page_3/item_05/main.jpg");
+        assertThat(catalog.item(5, 4, 3).targetImagePath())
+            .isEqualTo("/images/weill_images/page_5/item_12/main.jpg");
+    }
+
+    @Test
     void rejectsCoordinatesOutsideTheSixtyItems() {
         assertThatIllegalArgumentException().isThrownBy(() -> catalog.correctOption(6, 1, 1));
         assertThatIllegalArgumentException().isThrownBy(() -> catalog.correctOption(1, 5, 1));
