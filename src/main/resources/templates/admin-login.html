@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Ingreso de administrador</title>
+    <title>Acceso institucional</title>
     <link rel="stylesheet" href="/css/weill.css">
 </head>
 <body>
 <main class="start-shell">
     <section class="start-panel">
-        <p class="eyebrow">Administración Weill</p>
-        <h1>Ingreso de administrador</h1>
-        <p class="lead-copy">Ingresa con tu correo y contraseña de administrador.</p>
+        <p class="eyebrow">Sistema Weill</p>
+        <h1>Acceso institucional</h1>
+        <p class="lead-copy">Ingreso para licenciados, decana y administración técnica.</p>
         <p class="form-error" th:if="${error}" th:text="${error}">Error</p>
         <form class="start-form" method="post" action="/admin/login">
             <label>
@@ -21,7 +21,7 @@
                        autocomplete="username"
                        required
                        maxlength="254"
-                       placeholder="admin@weill.local"
+                       placeholder="correo@institucion.edu"
                        th:value="${email}">
             </label>
             <label>

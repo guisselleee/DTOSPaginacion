@@ -43,8 +43,8 @@ public class AdminController {
     @GetMapping("/admin/login")
     public String login(HttpSession session, Model model) {
         Optional<WeillUser> currentUser = sessionUserService.currentUser(session);
-        if (currentUser.filter(WeillUser::isAdmin).isPresent()) {
-            return "redirect:/admin";
+        if (currentUser.isPresent() && !currentUser.get().isEvaluatedUser()) {
+            return redirectForInstitutionalRole(currentUser.get());
         }
         if (!model.containsAttribute("email")) {
             model.addAttribute("email", "");
@@ -61,24 +61,26 @@ public class AdminController {
         RedirectAttributes redirectAttributes
     ) {
         try {
-            Optional<WeillUser> admin = userService.authenticateAdmin(email, password);
-            if (admin.isEmpty()) {
+            Optional<WeillUser> institutionalUser =
+                userService.authenticateInstitutionalUser(email, password);
+            if (institutionalUser.isEmpty()) {
                 redirectAttributes.addFlashAttribute("email", email);
-                redirectAttributes.addFlashAttribute("error", "Correo o contraseña de administrador incorrectos.");
+                redirectAttributes.addFlashAttribute("error", "Correo o contraseña institucional incorrectos.");
                 return "redirect:/admin/login";
             }
 
             request.changeSessionId();
-            session.setAttribute(AuthController.SESSION_USER_ID, admin.get().getId());
-            auditService.bindActorToSession(session, admin.get());
+            session.setAttribute(AuthController.SESSION_USER_ID, institutionalUser.get().getId());
+            auditService.bindActorToSession(session, institutionalUser.get());
             auditService.record(
                 AuditEventType.LOGIN,
-                admin.get(),
+                institutionalUser.get(),
                 null,
                 request,
-                "Inicio de sesión de administrador."
+                "Inicio de sesión institucional como "
+                    + institutionalUser.get().getRole().getDisplayName() + "."
             );
-            return "redirect:/admin";
+            return redirectForInstitutionalRole(institutionalUser.get());
         } catch (InvalidUserFormException exception) {
             redirectAttributes.addFlashAttribute("email", email);
             redirectAttributes.addFlashAttribute("error", exception.getMessage());
@@ -93,17 +95,17 @@ public class AdminController {
         HttpSession session,
         Model model
     ) {
-        Optional<WeillUser> admin = currentAdmin(session);
-        if (admin.isEmpty()) {
+        Optional<WeillUser> professional = currentClinicalProfessional(session);
+        if (professional.isEmpty()) {
             return "redirect:/admin/login";
         }
         AdminDashboardView dashboard = adminEvaluationService.dashboard(query);
-        model.addAttribute("admin", admin.get());
+        model.addAttribute("admin", professional.get());
         model.addAttribute("query", query);
         model.addAttribute("dashboard", dashboard);
         auditService.record(
             AuditEventType.ADMIN_ACCESS,
-            admin.get(),
+            professional.get(),
             null,
             request,
             query.isBlank() ? "Acceso al panel administrativo." : "Búsqueda administrativa: " + query
@@ -118,22 +120,22 @@ public class AdminController {
         HttpSession session,
         Model model
     ) {
-        Optional<WeillUser> admin = currentAdmin(session);
-        if (admin.isEmpty()) {
+        Optional<WeillUser> professional = currentClinicalProfessional(session);
+        if (professional.isEmpty()) {
             return "redirect:/admin/login";
         }
         AdminEvaluationDetail detail = adminEvaluationService.evaluation(attemptId);
         model.addAttribute("detail", detail);
         auditService.record(
             AuditEventType.ADMIN_ACCESS,
-            admin.get(),
+            professional.get(),
             attemptId,
             request,
             "Acceso administrativo al detalle de evaluación."
         );
         auditService.record(
             AuditEventType.RESULT_VIEWED,
-            admin.get(),
+            professional.get(),
             attemptId,
             request,
             "El administrador consultó resultados y respuestas."
@@ -148,7 +150,11 @@ public class AdminController {
         return "redirect:/admin/login";
     }
 
-    private Optional<WeillUser> currentAdmin(HttpSession session) {
-        return sessionUserService.currentUser(session).filter(WeillUser::isAdmin);
+    private Optional<WeillUser> currentClinicalProfessional(HttpSession session) {
+        return sessionUserService.currentUser(session).filter(WeillUser::canViewClinicalData);
+    }
+
+    private String redirectForInstitutionalRole(WeillUser user) {
+        return user.canManageSystem() ? "redirect:/system" : "redirect:/admin";
     }
 }

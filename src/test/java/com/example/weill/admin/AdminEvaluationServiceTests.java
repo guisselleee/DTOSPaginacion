@@ -58,6 +58,8 @@ class AdminEvaluationServiceTests {
         assertThat(attemptQuery).hasValue("estudiante@example.com");
         assertThat(dashboard.users()).isEmpty();
         assertThat(dashboard.evaluations()).isEmpty();
+        assertThat(dashboard.completedEvaluations()).isZero();
+        assertThat(dashboard.averageScore()).isZero();
     }
 
     private <T> T unsupported(Class<T> type) {

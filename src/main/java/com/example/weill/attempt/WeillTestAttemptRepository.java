@@ -21,7 +21,7 @@ public interface WeillTestAttemptRepository extends JpaRepository<WeillTestAttem
         select attempt
         from WeillTestAttempt attempt
         join fetch attempt.user user
-        where user.role = com.example.weill.user.UserRole.USER
+        where user.role = com.example.weill.user.UserRole.EVALUADO
           and (
             :query = ''
             or lower(user.displayName) like lower(concat('%', :query, '%'))

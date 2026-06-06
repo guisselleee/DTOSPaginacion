@@ -13,7 +13,7 @@
         <h1>Evaluaciones</h1>
     </div>
     <div class="admin-session">
-        <span th:text="${admin.email}">admin@weill.local</span>
+        <span th:text="${admin.role.displayName + ' · ' + admin.email}">Licenciado · correo</span>
         <form method="post" action="/admin/logout">
             <button class="secondary-action compact-action" type="submit">Cerrar sesión</button>
         </form>
@@ -21,6 +21,25 @@
 </header>
 
 <main class="admin-shell">
+    <section class="stats-strip" aria-label="Estadísticas">
+        <div>
+            <span>Evaluados</span>
+            <strong th:text="${dashboard.users.size()}">0</strong>
+        </div>
+        <div>
+            <span>Evaluaciones</span>
+            <strong th:text="${dashboard.evaluations.size()}">0</strong>
+        </div>
+        <div>
+            <span>Completadas</span>
+            <strong th:text="${dashboard.completedEvaluations}">0</strong>
+        </div>
+        <div>
+            <span>Promedio de aciertos</span>
+            <strong th:text="${#numbers.formatDecimal(dashboard.averageScore, 1, 1)} + '/60'">0.0/60</strong>
+        </div>
+    </section>
+
     <form class="admin-search" method="get" action="/admin">
         <label for="query">Buscar usuarios</label>
         <div class="search-controls">

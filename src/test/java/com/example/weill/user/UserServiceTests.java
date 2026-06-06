@@ -20,12 +20,12 @@ class UserServiceTests {
             "admin@weill.local",
             "Administrador Weill",
             passwordEncoder.encode("WeillAdmin2026!"),
-            UserRole.ADMIN
+            UserRole.LICENCIADO
         );
         WeillUserRepository userRepository = repositoryReturning(admin);
         UserService userService = new UserService(userRepository, passwordEncoder);
 
-        assertThat(userService.authenticateAdmin("ADMIN@WEILL.LOCAL", "WeillAdmin2026!"))
+        assertThat(userService.authenticateInstitutionalUser("ADMIN@WEILL.LOCAL", "WeillAdmin2026!"))
             .contains(admin);
     }
 
@@ -35,12 +35,12 @@ class UserServiceTests {
             "admin@weill.local",
             "Administrador Weill",
             passwordEncoder.encode("WeillAdmin2026!"),
-            UserRole.ADMIN
+            UserRole.LICENCIADO
         );
         WeillUserRepository userRepository = repositoryReturning(admin);
         UserService userService = new UserService(userRepository, passwordEncoder);
 
-        assertThat(userService.authenticateAdmin("admin@weill.local", "incorrecta")).isEmpty();
+        assertThat(userService.authenticateInstitutionalUser("admin@weill.local", "incorrecta")).isEmpty();
     }
 
     @Test
@@ -56,12 +56,13 @@ class UserServiceTests {
         UserService userService = new UserService(userRepository, passwordEncoder);
 
         assertThat(userService.findByEmail("USER@EXAMPLE.COM")).isEmpty();
-        assertThat(requestedRole).hasValue(UserRole.USER);
+        assertThat(requestedRole).hasValue(UserRole.EVALUADO);
     }
 
     private WeillUserRepository repositoryReturning(WeillUser user) {
         return repository((methodName, arguments) -> {
-            if (methodName.equals("findByEmailIgnoreCaseAndRole")) {
+            if (methodName.equals("findByEmailIgnoreCaseAndRole")
+                || methodName.equals("findByEmailIgnoreCase")) {
                 return Optional.of(user);
             }
             return defaultValue(methodName);

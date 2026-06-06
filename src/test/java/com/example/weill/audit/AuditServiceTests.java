@@ -22,7 +22,7 @@ class AuditServiceTests {
             "admin@weill.local",
             "Administrador",
             "hash",
-            UserRole.ADMIN
+            UserRole.LICENCIADO
         );
         setId(admin, 9L);
         HttpSession session = session("session-123");
@@ -40,7 +40,7 @@ class AuditServiceTests {
         assertThat(log.getEventType()).isEqualTo(AuditEventType.ADMIN_ACCESS);
         assertThat(log.getActorUserId()).isEqualTo(9L);
         assertThat(log.getActorEmail()).isEqualTo("admin@weill.local");
-        assertThat(log.getActorRole()).isEqualTo("ADMIN");
+        assertThat(log.getActorRole()).isEqualTo("LICENCIADO");
         assertThat(log.getAttemptId()).isEqualTo(42L);
         assertThat(log.getSessionId()).isEqualTo("session-123");
         assertThat(log.getIpAddress()).isEqualTo("203.0.113.10");

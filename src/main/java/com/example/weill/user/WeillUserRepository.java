@@ -16,10 +16,12 @@ public interface WeillUserRepository extends JpaRepository<WeillUser, Long> {
 
     Optional<WeillUser> findByEmailIgnoreCaseAndRole(String email, UserRole role);
 
+    List<WeillUser> findByRoleNotOrderByDisplayNameAsc(UserRole role);
+
     @Query("""
         select user
         from WeillUser user
-        where user.role = com.example.weill.user.UserRole.USER
+        where user.role = com.example.weill.user.UserRole.EVALUADO
           and (
             :query = ''
             or lower(user.displayName) like lower(concat('%', :query, '%'))

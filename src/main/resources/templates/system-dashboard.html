@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Administración técnica</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<header class="admin-header">
+    <div>
+        <p class="eyebrow">Sistema Weill</p>
+        <h1>Administración técnica</h1>
+    </div>
+    <div class="admin-session">
+        <span th:text="${technicalAdmin.email}">tecnico@weill.local</span>
+        <form method="post" action="/admin/logout">
+            <button class="secondary-action compact-action" type="submit">Cerrar sesión</button>
+        </form>
+    </div>
+</header>
+
+<main class="admin-shell">
+    <p class="form-error" th:if="${error}" th:text="${error}">Error</p>
+    <p class="form-success" th:if="${message}" th:text="${message}">Guardado</p>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Accesos</p>
+                <h2>Gestionar usuarios autorizados</h2>
+            </div>
+        </div>
+        <form class="authorized-user-form" method="post" action="/system/users">
+            <label>
+                Nombre
+                <input name="name" required maxlength="160">
+            </label>
+            <label>
+                Correo electrónico
+                <input name="email" type="email" required maxlength="254">
+            </label>
+            <label>
+                Rol
+                <select name="role" required>
+                    <option th:each="role : ${roles}"
+                            th:value="${role.name()}"
+                            th:text="${role.displayName}">Licenciado</option>
+                </select>
+            </label>
+            <label>
+                Contraseña
+                <input name="password" type="password" autocomplete="new-password">
+                <small>Obligatoria al crear; déjala vacía para conservarla al actualizar.</small>
+            </label>
+            <button class="primary-action" type="submit">Guardar usuario</button>
+        </form>
+
+        <div class="table-wrap technical-table">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${authorizedUsers}">
+                    <td th:text="${user.displayName}">Nombre</td>
+                    <td th:text="${user.email}">correo@institucion.edu</td>
+                    <td th:text="${user.role.displayName}">Licenciado</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Seguridad</p>
+                <h2>Auditoría reciente</h2>
+            </div>
+            <strong>Últimos 100 eventos</strong>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Evento</th>
+                    <th>Actor</th>
+                    <th>Rol</th>
+                    <th>Evaluación</th>
+                    <th>Detalle</th>
+                    <th>IP</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="event : ${auditEvents}">
+                    <td th:text="${#temporals.format(event.occurredAt, 'dd/MM/yyyy HH:mm:ss')}">Fecha</td>
+                    <td th:text="${event.eventType}">LOGIN</td>
+                    <td th:text="${event.actorEmail ?: 'Sistema'}">Actor</td>
+                    <td th:text="${event.actorRole ?: 'N/A'}">Rol</td>
+                    <td th:text="${event.attemptId ?: 'N/A'}">N/A</td>
+                    <td th:text="${event.details ?: 'Sin detalle'}">Detalle</td>
+                    <td th:text="${event.ipAddress ?: 'N/A'}">IP</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -13,7 +13,7 @@ INSERT INTO weill_users (
 VALUES
     (
         'maria.lopez@example.com',
-        'USER',
+        'EVALUADO',
         'María López',
         'Primaria',
         'Colegio Rubén Darío',
@@ -24,7 +24,7 @@ VALUES
     ),
     (
         'carlos.martinez@example.com',
-        'USER',
+        'EVALUADO',
         'Carlos Martínez',
         'Secundaria',
         'Instituto Nacional Central',
@@ -35,7 +35,7 @@ VALUES
     ),
     (
         'ana.garcia@example.com',
-        'USER',
+        'EVALUADO',
         'Ana García',
         'Universidad',
         'Universidad Nacional',
@@ -46,7 +46,7 @@ VALUES
     ),
     (
         'jose.ramirez@example.com',
-        'USER',
+        'EVALUADO',
         'José Ramírez',
         'Secundaria completa',
         NULL,
@@ -200,7 +200,7 @@ SELECT
     event.event_type,
     user_record.id,
     user_record.email,
-    'USER',
+    'EVALUADO',
     attempt.id,
     event.session_id,
     '127.0.0.1',

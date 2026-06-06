@@ -48,13 +48,20 @@ public class AdminEvaluationService {
         List<AdminEvaluationSummary> evaluations = attemptRepository.searchForAdmin(query).stream()
             .map(this::evaluationSummary)
             .toList();
-        return new AdminDashboardView(users, evaluations);
+        List<AdminEvaluationSummary> completed = evaluations.stream()
+            .filter(AdminEvaluationSummary::completed)
+            .toList();
+        double averageScore = completed.stream()
+            .mapToInt(AdminEvaluationSummary::totalScore)
+            .average()
+            .orElse(0);
+        return new AdminDashboardView(users, evaluations, completed.size(), averageScore);
     }
 
     @Transactional(readOnly = true)
     public AdminEvaluationDetail evaluation(long attemptId) {
         WeillTestAttempt attempt = attemptRepository.findById(attemptId)
-            .filter(candidate -> !candidate.getUser().isAdmin())
+            .filter(candidate -> candidate.getUser().isEvaluatedUser())
             .orElseThrow(() -> new AttemptNotFoundException(attemptId));
         List<ItemResponse> responses =
             responseRepository.findByAttemptIdOrderByPageNumberAscRowNumberAscItemNumberAsc(attemptId);

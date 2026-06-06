@@ -78,7 +78,7 @@ public class AttemptApiController {
     private WeillUser requireRegularUser(HttpSession session) {
         WeillUser user = sessionUserService.currentUser(session)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-        if (user.isAdmin()) {
+        if (!user.isEvaluatedUser()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return user;

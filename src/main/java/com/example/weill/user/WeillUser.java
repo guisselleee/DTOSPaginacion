@@ -28,7 +28,7 @@ public class WeillUser {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole role = UserRole.USER;
+    private UserRole role = UserRole.EVALUADO;
 
     @Column(name = "password_hash")
     private String passwordHash;
@@ -146,7 +146,24 @@ public class WeillUser {
         this.displayName = displayName;
     }
 
-    public boolean isAdmin() {
-        return role == UserRole.ADMIN;
+    public boolean isEvaluatedUser() {
+        return role.canTakeTest();
+    }
+
+    public boolean canViewClinicalData() {
+        return role.canViewClinicalData();
+    }
+
+    public boolean canManageSystem() {
+        return role.canManageSystem();
+    }
+
+    public void updateAuthorizedAccess(String displayName, String passwordHash, UserRole role) {
+        if (!role.requiresPassword()) {
+            throw new IllegalArgumentException("Authorized access requires an institutional role.");
+        }
+        this.displayName = displayName;
+        this.passwordHash = passwordHash;
+        this.role = role;
     }
 }

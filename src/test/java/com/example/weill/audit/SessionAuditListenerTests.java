@@ -54,7 +54,7 @@ class SessionAuditListenerTests {
         Map<String, Object> attributes = new HashMap<>();
         attributes.put(AuthController.SESSION_USER_ID, 15L);
         attributes.put(AuditService.SESSION_ACTOR_EMAIL, "user@example.com");
-        attributes.put(AuditService.SESSION_ACTOR_ROLE, "USER");
+        attributes.put(AuditService.SESSION_ACTOR_ROLE, "EVALUADO");
         return attributes;
     }
 

@@ -29,7 +29,7 @@ public class AuditLog {
     @Column(name = "actor_email")
     private String actorEmail;
 
-    @Column(name = "actor_role", length = 16)
+    @Column(name = "actor_role", length = 20)
     private String actorRole;
 
     @Column(name = "attempt_id")

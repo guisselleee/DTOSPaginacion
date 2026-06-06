@@ -34,14 +34,18 @@ class AdminUserSeederTests {
             userRepository,
             passwordEncoder,
             "admin@weill.local",
-            "WeillAdmin2026!"
+            "WeillAdmin2026!",
+            "decana@weill.local",
+            "WeillDecana2026!",
+            "tecnico@weill.local",
+            "WeillTecnico2026!"
         );
         seeder.run(null);
 
         WeillUser savedAdmin = savedUser.get();
-        assertThat(savedAdmin.getRole()).isEqualTo(UserRole.ADMIN);
-        assertThat(savedAdmin.getEmail()).isEqualTo("admin@weill.local");
-        assertThat(savedAdmin.getPasswordHash()).isNotEqualTo("WeillAdmin2026!");
-        assertThat(passwordEncoder.matches("WeillAdmin2026!", savedAdmin.getPasswordHash())).isTrue();
+        assertThat(savedAdmin.getRole()).isEqualTo(UserRole.ADMIN_TECNICO);
+        assertThat(savedAdmin.getEmail()).isEqualTo("tecnico@weill.local");
+        assertThat(savedAdmin.getPasswordHash()).isNotEqualTo("WeillTecnico2026!");
+        assertThat(passwordEncoder.matches("WeillTecnico2026!", savedAdmin.getPasswordHash())).isTrue();
     }
 }

@@ -508,6 +508,74 @@ p {
     margin-bottom: 24px;
 }
 
+.stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--line);
+}
+
+.stats-strip div {
+    display: grid;
+    gap: 6px;
+    background: var(--panel);
+    padding: 18px;
+}
+
+.stats-strip span {
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.stats-strip strong {
+    font-size: 1.45rem;
+}
+
+.authorized-user-form {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    align-items: end;
+    gap: 14px;
+}
+
+.authorized-user-form label {
+    display: grid;
+    gap: 7px;
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.authorized-user-form input,
+.authorized-user-form select {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: white;
+    padding: 11px 12px;
+    color: var(--ink);
+}
+
+.authorized-user-form small {
+    font-weight: 600;
+}
+
+.technical-table {
+    margin-top: 24px;
+}
+
+.form-success {
+    border: 1px solid #a7dfbd;
+    border-radius: 6px;
+    background: #dff7e9;
+    padding: 12px 14px;
+    color: var(--good);
+    font-weight: 700;
+}
+
 .admin-search label {
     color: var(--muted);
     font-weight: 800;
@@ -688,6 +756,11 @@ th {
     .search-controls {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .stats-strip,
+    .authorized-user-form {
+        grid-template-columns: 1fr;
     }
 
     .search-controls input {

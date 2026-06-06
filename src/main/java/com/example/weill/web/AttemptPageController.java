@@ -46,8 +46,8 @@ public class AttemptPageController {
         if (user == null) {
             return "redirect:/login";
         }
-        if (user.isAdmin()) {
-            return "redirect:/admin";
+        if (!user.isEvaluatedUser()) {
+            return redirectForRole(user);
         }
         model.addAttribute("user", user);
         return "index";
@@ -59,8 +59,8 @@ public class AttemptPageController {
         if (user == null) {
             return "redirect:/login";
         }
-        if (user.isAdmin()) {
-            return "redirect:/admin";
+        if (!user.isEvaluatedUser()) {
+            return redirectForRole(user);
         }
         WeillTestAttempt attempt = attemptService.startAttempt(user);
         auditService.record(
@@ -79,8 +79,8 @@ public class AttemptPageController {
         if (user == null) {
             return "redirect:/login";
         }
-        if (user.isAdmin()) {
-            return "redirect:/admin";
+        if (!user.isEvaluatedUser()) {
+            return redirectForRole(user);
         }
         model.addAttribute("attempt", attemptService.getAttemptForUser(attemptId, user.getId()));
         model.addAttribute("pages", catalog.pages());
@@ -141,7 +141,7 @@ public class AttemptPageController {
 
     private WeillUser currentRegularUser(HttpSession session) {
         WeillUser user = currentUser(session);
-        if (user == null || user.isAdmin()) {
+        if (user == null || !user.isEvaluatedUser()) {
             return null;
         }
         return user;
@@ -149,6 +149,10 @@ public class AttemptPageController {
 
     private String redirectForCurrentSession(HttpSession session) {
         WeillUser user = currentUser(session);
-        return user != null && user.isAdmin() ? "redirect:/admin" : "redirect:/login";
+        return user == null ? "redirect:/login" : redirectForRole(user);
+    }
+
+    private String redirectForRole(WeillUser user) {
+        return user.canManageSystem() ? "redirect:/system" : "redirect:/admin";
     }
 }
