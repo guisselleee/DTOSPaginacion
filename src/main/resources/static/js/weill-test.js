@@ -89,13 +89,9 @@
         ghost.setAttribute('aria-hidden', 'true');
 
         const image = tile.querySelector('img')?.cloneNode(true);
-        const label = tile.querySelector('span')?.cloneNode(true);
         if (image) {
             image.draggable = false;
             ghost.appendChild(image);
-        }
-        if (label) {
-            ghost.appendChild(label);
         }
         return ghost;
     }
@@ -179,11 +175,7 @@
         image.alt = `Opción ${option} seleccionada`;
         image.draggable = false;
 
-        const badge = document.createElement('span');
-        badge.className = 'placed-answer-badge';
-        badge.textContent = option;
-
-        dropZone.append(image, badge);
+        dropZone.append(image);
     }
 
     function clearPlacedAnswer(item) {
