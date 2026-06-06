@@ -9,7 +9,7 @@
     const items = Array.from(document.querySelectorAll('[data-test-items] .test-item'));
     const selections = new Map();
     const answeredCount = document.querySelector('[data-answered-count]');
-    const currentScore = document.querySelector('[data-current-score]');
+    const elapsedTime = document.querySelector('[data-elapsed-time]');
     const currentItem = document.querySelector('[data-current-item]');
     const currentTitle = document.querySelector('[data-current-title]');
     const statusMessage = document.querySelector('[data-status-message]');
@@ -20,6 +20,7 @@
     let busy = false;
 
     document.querySelectorAll('.option-tile img').forEach(image => image.draggable = false);
+    startElapsedTimer();
     showActiveItem();
     document.addEventListener('pointerdown', beginDrag);
     document.addEventListener('pointermove', moveDrag);
@@ -192,9 +193,23 @@
 
     function updateProgress(result) {
         answeredCount.textContent = result?.answeredItems ?? selections.size;
-        if (currentScore) {
-            currentScore.textContent = result?.currentScore ?? currentScore.textContent;
-        }
+    }
+
+    function startElapsedTimer() {
+        const parsedStart = Date.parse(shell.dataset.startedAt);
+        const startedAt = Number.isNaN(parsedStart) ? Date.now() : parsedStart;
+        const renderElapsedTime = () => {
+            const elapsedSeconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+            const hours = Math.floor(elapsedSeconds / 3600);
+            const minutes = Math.floor((elapsedSeconds % 3600) / 60);
+            const seconds = elapsedSeconds % 60;
+            elapsedTime.textContent = [hours, minutes, seconds]
+                .map(value => String(value).padStart(2, '0'))
+                .join(':');
+        };
+
+        renderElapsedTime();
+        window.setInterval(renderElapsedTime, 1000);
     }
 
     function showActiveItem() {

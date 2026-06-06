@@ -15,11 +15,12 @@
     </div>
     <div class="progress-panel" aria-live="polite">
         <span><strong data-answered-count>0</strong>/<span th:text="${totalItems}">60</span> respondidas</span>
-        <span>Puntaje: <strong data-current-score>0</strong>/<strong th:text="${totalItems}">60</strong></span>
+        <span>Tiempo transcurrido: <strong data-elapsed-time>00:00:00</strong></span>
     </div>
 </header>
 
-<main class="test-shell" th:attr="data-attempt-id=${attempt.id},data-total-items=${totalItems}">
+<main class="test-shell"
+      th:attr="data-attempt-id=${attempt.id},data-total-items=${totalItems},data-started-at=${attempt.startedAt}">
     <section class="single-test-card" aria-live="polite">
         <div class="page-heading">
             <h2 data-current-title>Prueba 1</h2>
