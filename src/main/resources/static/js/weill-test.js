@@ -9,6 +9,7 @@
     const items = Array.from(document.querySelectorAll('[data-test-items] .test-item'));
     const selections = new Map();
     const answeredCount = document.querySelector('[data-answered-count]');
+    const correctCount = document.querySelector('[data-correct-count]');
     const elapsedTime = document.querySelector('[data-elapsed-time]');
     const currentItem = document.querySelector('[data-current-item]');
     const currentTitle = document.querySelector('[data-current-title]');
@@ -193,6 +194,9 @@
 
     function updateProgress(result) {
         answeredCount.textContent = result?.answeredItems ?? selections.size;
+        if (result) {
+            correctCount.textContent = result.currentScore;
+        }
     }
 
     function startElapsedTimer() {
