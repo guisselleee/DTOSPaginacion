@@ -5,6 +5,7 @@ import com.example.weill.user.InvalidUserFormException;
 import com.example.weill.user.UserRegistrationForm;
 import com.example.weill.user.UserService;
 import com.example.weill.user.WeillUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +39,7 @@ public class AuthController {
     @PostMapping("/login")
     public String authenticate(
         @RequestParam String email,
+        HttpServletRequest request,
         HttpSession session,
         RedirectAttributes redirectAttributes
     ) {
@@ -49,6 +51,7 @@ public class AuthController {
                 return "redirect:/login";
             }
 
+            request.changeSessionId();
             session.setAttribute(SESSION_USER_ID, user.get().getId());
             return "redirect:/";
         } catch (InvalidUserFormException exception) {
@@ -69,11 +72,13 @@ public class AuthController {
     @PostMapping("/register")
     public String createUser(
         @ModelAttribute("registration") UserRegistrationForm registration,
+        HttpServletRequest request,
         HttpSession session,
         RedirectAttributes redirectAttributes
     ) {
         try {
             WeillUser user = userService.register(registration);
+            request.changeSessionId();
             session.setAttribute(SESSION_USER_ID, user.getId());
             return "redirect:/";
         } catch (DuplicateEmailException exception) {

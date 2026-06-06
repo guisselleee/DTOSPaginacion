@@ -2,6 +2,8 @@ package com.example.weill.user;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,13 @@ public class WeillUser {
 
     @Column(unique = true)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserRole role = UserRole.USER;
+
+    @Column(name = "password_hash")
+    private String passwordHash;
 
     @Column(name = "display_name", nullable = false)
     private String displayName;
@@ -74,6 +83,13 @@ public class WeillUser {
         this.currentlyStudying = currentlyStudying;
     }
 
+    public WeillUser(String email, String displayName, String passwordHash, UserRole role) {
+        this.email = email;
+        this.displayName = displayName;
+        this.passwordHash = passwordHash;
+        this.role = role;
+    }
+
     public Long getId() {
         return id;
     }
@@ -84,6 +100,14 @@ public class WeillUser {
 
     public String getEmail() {
         return email;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public String getDisplayName() {
@@ -120,5 +144,9 @@ public class WeillUser {
 
     public void updateDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public boolean isAdmin() {
+        return role == UserRole.ADMIN;
     }
 }

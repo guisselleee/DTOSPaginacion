@@ -2,6 +2,7 @@ package com.example.weill.user;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +15,11 @@ public class UserService {
     private static final Pattern BASIC_EMAIL = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
 
     private final WeillUserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(WeillUserRepository userRepository) {
+    public UserService(WeillUserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -49,7 +52,18 @@ public class UserService {
     @Transactional(readOnly = true)
     public Optional<WeillUser> findByEmail(String email) {
         String normalizedEmail = normalizeRequiredEmail(email);
-        return userRepository.findByEmailIgnoreCase(normalizedEmail);
+        return userRepository.findByEmailIgnoreCaseAndRole(normalizedEmail, UserRole.USER);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<WeillUser> authenticateAdmin(String email, String password) {
+        String normalizedEmail = normalizeRequiredEmail(email);
+        if (password == null || password.isBlank()) {
+            throw new InvalidUserFormException("La contraseña es obligatoria.");
+        }
+        return userRepository.findByEmailIgnoreCaseAndRole(normalizedEmail, UserRole.ADMIN)
+            .filter(admin -> admin.getPasswordHash() != null)
+            .filter(admin -> passwordEncoder.matches(password, admin.getPasswordHash()));
     }
 
     @Transactional(readOnly = true)

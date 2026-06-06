@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ingreso de administrador</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<main class="start-shell">
+    <section class="start-panel">
+        <p class="eyebrow">Administración Weill</p>
+        <h1>Ingreso de administrador</h1>
+        <p class="lead-copy">Ingresa con tu correo y contraseña de administrador.</p>
+        <p class="form-error" th:if="${error}" th:text="${error}">Error</p>
+        <form class="start-form" method="post" action="/admin/login">
+            <label>
+                Correo electrónico
+                <input name="email"
+                       type="email"
+                       autocomplete="username"
+                       required
+                       maxlength="254"
+                       placeholder="admin@weill.local"
+                       th:value="${email}">
+            </label>
+            <label>
+                Contraseña
+                <input name="password"
+                       type="password"
+                       autocomplete="current-password"
+                       required>
+            </label>
+            <button type="submit">Entrar</button>
+        </form>
+        <p class="form-footer">
+            <a href="/login">Volver al ingreso de participantes</a>
+        </p>
+    </section>
+</main>
+</body>
+</html>

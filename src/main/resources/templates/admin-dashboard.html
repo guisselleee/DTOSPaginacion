@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel de administración</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<main class="start-shell">
+    <section class="start-panel">
+        <p class="eyebrow">Administración Weill</p>
+        <h1>Panel de resultados</h1>
+        <p class="lead-copy" th:text="'Sesión iniciada como ' + ${admin.email}">
+            Sesión iniciada como administrador.
+        </p>
+        <p>El dashboard con los resultados completos de los participantes se agregará en una siguiente etapa.</p>
+        <form method="post" action="/admin/logout">
+            <button class="secondary-action" type="submit">Cerrar sesión</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

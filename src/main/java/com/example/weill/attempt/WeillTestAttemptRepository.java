@@ -10,4 +10,7 @@ public interface WeillTestAttemptRepository extends JpaRepository<WeillTestAttem
     @Override
     @EntityGraph(attributePaths = "user")
     Optional<WeillTestAttempt> findById(Long id);
+
+    @EntityGraph(attributePaths = "user")
+    Optional<WeillTestAttempt> findByIdAndUser_Id(Long id, Long userId);
 }

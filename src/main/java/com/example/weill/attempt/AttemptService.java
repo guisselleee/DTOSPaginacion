@@ -49,8 +49,8 @@ public class AttemptService {
     }
 
     @Transactional
-    public SaveResponsesResult saveResponses(long attemptId, List<ResponseSubmission> submissions) {
-        WeillTestAttempt attempt = getAttempt(attemptId);
+    public SaveResponsesResult saveResponses(long attemptId, long userId, List<ResponseSubmission> submissions) {
+        WeillTestAttempt attempt = getAttemptForUser(attemptId, userId);
         if (attempt.isCompleted()) {
             throw new IllegalStateException("Completed attempts cannot be changed.");
         }
@@ -61,9 +61,14 @@ public class AttemptService {
     }
 
     @Transactional
-    public CompleteAttemptResult completeAttempt(long attemptId, List<ResponseSubmission> submissions) {
-        saveResponses(attemptId, submissions);
-        WeillTestAttempt attempt = getAttempt(attemptId);
+    public CompleteAttemptResult completeAttempt(long attemptId, long userId, List<ResponseSubmission> submissions) {
+        WeillTestAttempt attempt = getAttemptForUser(attemptId, userId);
+        if (attempt.isCompleted()) {
+            throw new IllegalStateException("Completed attempts cannot be changed.");
+        }
+        for (ResponseSubmission submission : submissions) {
+            saveResponse(attempt, submission);
+        }
         long answeredItems = responseRepository.countByAttemptId(attemptId);
         if (answeredItems < catalog.totalItems()) {
             throw new IllegalStateException("All 60 items must be answered before completing the attempt.");
@@ -74,10 +79,16 @@ public class AttemptService {
     }
 
     @Transactional(readOnly = true)
-    public AttemptResultView result(long attemptId) {
-        WeillTestAttempt attempt = getAttempt(attemptId);
+    public AttemptResultView result(long attemptId, long userId) {
+        WeillTestAttempt attempt = getAttemptForUser(attemptId, userId);
         List<ItemResponse> responses = responseRepository.findByAttemptIdOrderByPageNumberAscRowNumberAscItemNumberAsc(attemptId);
         return new AttemptResultView(attempt, responses, responses.size());
+    }
+
+    @Transactional(readOnly = true)
+    public WeillTestAttempt getAttemptForUser(long attemptId, long userId) {
+        return attemptRepository.findByIdAndUser_Id(attemptId, userId)
+            .orElseThrow(() -> new AttemptNotFoundException(attemptId));
     }
 
     private void saveResponse(WeillTestAttempt attempt, ResponseSubmission submission) {
