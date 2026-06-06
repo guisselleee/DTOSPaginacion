@@ -7,17 +7,117 @@
     <link rel="stylesheet" href="/css/weill.css">
 </head>
 <body>
-<main class="start-shell">
-    <section class="start-panel">
+<header class="admin-header">
+    <div>
         <p class="eyebrow">Administración Weill</p>
-        <h1>Panel de resultados</h1>
-        <p class="lead-copy" th:text="'Sesión iniciada como ' + ${admin.email}">
-            Sesión iniciada como administrador.
-        </p>
-        <p>El dashboard con los resultados completos de los participantes se agregará en una siguiente etapa.</p>
+        <h1>Evaluaciones</h1>
+    </div>
+    <div class="admin-session">
+        <span th:text="${admin.email}">admin@weill.local</span>
         <form method="post" action="/admin/logout">
-            <button class="secondary-action" type="submit">Cerrar sesión</button>
+            <button class="secondary-action compact-action" type="submit">Cerrar sesión</button>
         </form>
+    </div>
+</header>
+
+<main class="admin-shell">
+    <form class="admin-search" method="get" action="/admin">
+        <label for="query">Buscar usuarios</label>
+        <div class="search-controls">
+            <input id="query"
+                   name="query"
+                   type="search"
+                   th:value="${query}"
+                   placeholder="Nombre o correo electrónico">
+            <button class="primary-action" type="submit">Buscar</button>
+            <a class="secondary-link" href="/admin" th:if="${!query.isBlank()}">Limpiar</a>
+        </div>
+    </form>
+
+    <section class="admin-section" aria-labelledby="users-title">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Directorio</p>
+                <h2 id="users-title">Usuarios</h2>
+            </div>
+            <strong th:text="${dashboard.users.size()} + ' encontrados'">0 encontrados</strong>
+        </div>
+
+        <div class="empty-state" th:if="${dashboard.users.empty}">
+            No se encontraron usuarios con ese nombre o correo.
+        </div>
+        <div class="table-wrap" th:unless="${dashboard.users.empty}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Escolaridad</th>
+                    <th>Ubicación</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${dashboard.users}">
+                    <td th:text="${user.name}">Nombre</td>
+                    <td th:text="${user.email}">correo@example.com</td>
+                    <td th:text="${user.educationLevel ?: 'No registrada'}">Escolaridad</td>
+                    <td th:text="${(user.municipality ?: 'No registrado') + ', ' + (user.department ?: 'No registrado')}">
+                        Municipio, departamento
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="admin-section" aria-labelledby="evaluations-title">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Historial</p>
+                <h2 id="evaluations-title">Evaluaciones realizadas</h2>
+            </div>
+            <strong th:text="${dashboard.evaluations.size()} + ' encontradas'">0 encontradas</strong>
+        </div>
+
+        <div class="empty-state" th:if="${dashboard.evaluations.empty}">
+            No hay evaluaciones para los usuarios encontrados.
+        </div>
+        <div class="table-wrap" th:unless="${dashboard.evaluations.empty}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Participante</th>
+                    <th>Inicio</th>
+                    <th>Estado</th>
+                    <th>Aciertos</th>
+                    <th>Tiempo empleado</th>
+                    <th><span class="visually-hidden">Acciones</span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="evaluation : ${dashboard.evaluations}">
+                    <td>
+                        <strong th:text="${evaluation.participantName}">Participante</strong>
+                        <small th:text="${evaluation.email}">correo@example.com</small>
+                    </td>
+                    <td th:text="${evaluation.startedAt}">01/01/2026 10:00</td>
+                    <td>
+                        <span class="status-badge"
+                              th:classappend="${evaluation.completed} ? ' completed' : ' in-progress'"
+                              th:text="${evaluation.status}">Completada</span>
+                    </td>
+                    <td th:text="${evaluation.completed ? evaluation.totalScore + '/' + evaluation.maxScore : 'Pendiente'}">
+                        50/60
+                    </td>
+                    <td th:text="${evaluation.elapsedTime}">00:30:00</td>
+                    <td class="table-action">
+                        <a class="secondary-link compact-action"
+                           th:href="@{/admin/evaluations/{id}(id=${evaluation.id})}">Consultar</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 </main>
 </body>

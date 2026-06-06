@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detalle de evaluación</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<header class="admin-header">
+    <div>
+        <p class="eyebrow">Administración Weill</p>
+        <h1>Detalle de evaluación</h1>
+    </div>
+    <a class="secondary-link" href="/admin">Volver al panel</a>
+</header>
+
+<main class="admin-shell">
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Participante</p>
+                <h2 th:text="${detail.attempt.user.displayName}">Nombre del participante</h2>
+                <p class="lead-copy" th:text="${detail.attempt.user.email}">correo@example.com</p>
+            </div>
+            <span class="status-badge"
+                  th:classappend="${detail.attempt.completed} ? ' completed' : ' in-progress'"
+                  th:text="${detail.attempt.completed} ? 'Completada' : 'En curso'">Completada</span>
+        </div>
+
+        <dl class="result-metrics admin-result-metrics">
+            <div>
+                <dt>Inicio</dt>
+                <dd th:text="${detail.startedAt}">01/01/2026 10:00</dd>
+            </div>
+            <div>
+                <dt>Finalización</dt>
+                <dd th:text="${detail.completedAt}">01/01/2026 10:30</dd>
+            </div>
+            <div>
+                <dt>Tiempo empleado</dt>
+                <dd th:text="${detail.elapsedTime}">00:30:00</dd>
+            </div>
+            <div>
+                <dt>Aciertos</dt>
+                <dd th:text="${detail.attempt.completed ? detail.attempt.totalScore + '/' + detail.attempt.maxScore : 'Pendiente'}">
+                    50/60
+                </dd>
+            </div>
+            <div>
+                <dt>Edad</dt>
+                <dd th:text="${detail.psychometricResult != null ? detail.psychometricResult.age + ' años' : 'Pendiente'}">
+                    18 años
+                </dd>
+            </div>
+            <div>
+                <dt>Grupo poblacional</dt>
+                <dd th:text="${detail.psychometricResult != null ? detail.psychometricResult.populationCategory.displayName : 'Pendiente'}">
+                    Universitario
+                </dd>
+            </div>
+            <div>
+                <dt>Percentil</dt>
+                <dd th:text="${detail.psychometricResult != null ? detail.psychometricResult.percentile : 'Pendiente'}">90</dd>
+            </div>
+            <div>
+                <dt>Coeficiente intelectual (CI)</dt>
+                <dd th:text="${detail.psychometricResult != null ? detail.psychometricResult.intelligenceQuotient : 'Pendiente'}">
+                    119
+                </dd>
+            </div>
+            <div>
+                <dt>Interpretación</dt>
+                <dd th:text="${detail.psychometricResult != null ? detail.psychometricResult.interpretation.displayName : 'Pendiente'}">
+                    Buena inteligencia
+                </dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="admin-section" aria-labelledby="answers-title">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Detalle</p>
+                <h2 id="answers-title">Respuestas</h2>
+            </div>
+            <strong th:text="${detail.responses.size()} + '/60 registradas'">60/60 registradas</strong>
+        </div>
+
+        <div class="empty-state" th:if="${detail.responses.empty}">
+            Esta evaluación todavía no tiene respuestas registradas.
+        </div>
+        <div class="table-wrap" th:unless="${detail.responses.empty}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Página</th>
+                    <th>Fila</th>
+                    <th>Item</th>
+                    <th>Opción seleccionada</th>
+                    <th>Opción correcta</th>
+                    <th>Resultado</th>
+                    <th>Respondida</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="response : ${detail.responses}">
+                    <td th:text="${response.pageNumber}">1</td>
+                    <td th:text="${response.rowNumber}">1</td>
+                    <td th:text="${response.itemNumber}">1</td>
+                    <td th:text="${response.selectedOption}">2</td>
+                    <td th:text="${response.correctOption}">2</td>
+                    <td>
+                        <span class="answer-badge"
+                              th:classappend="${response.correct} ? ' good' : ' bad'"
+                              th:text="${response.correct} ? 'Correcta' : 'Incorrecta'">Correcta</span>
+                    </td>
+                    <td th:text="${#temporals.format(response.answeredAt, 'dd/MM/yyyy HH:mm:ss')}">
+                        01/01/2026 10:01:00
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

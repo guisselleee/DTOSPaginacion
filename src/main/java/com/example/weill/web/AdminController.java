@@ -1,5 +1,8 @@
 package com.example.weill.web;
 
+import com.example.weill.admin.AdminDashboardView;
+import com.example.weill.admin.AdminEvaluationDetail;
+import com.example.weill.admin.AdminEvaluationService;
 import com.example.weill.user.InvalidUserFormException;
 import com.example.weill.user.UserService;
 import com.example.weill.user.WeillUser;
@@ -8,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -19,10 +23,16 @@ public class AdminController {
 
     private final UserService userService;
     private final SessionUserService sessionUserService;
+    private final AdminEvaluationService adminEvaluationService;
 
-    public AdminController(UserService userService, SessionUserService sessionUserService) {
+    public AdminController(
+        UserService userService,
+        SessionUserService sessionUserService,
+        AdminEvaluationService adminEvaluationService
+    ) {
         this.userService = userService;
         this.sessionUserService = sessionUserService;
+        this.adminEvaluationService = adminEvaluationService;
     }
 
     @GetMapping("/admin/login")
@@ -64,18 +74,43 @@ public class AdminController {
     }
 
     @GetMapping("/admin")
-    public String dashboard(HttpSession session, Model model) {
-        Optional<WeillUser> admin = sessionUserService.currentUser(session).filter(WeillUser::isAdmin);
+    public String dashboard(
+        @RequestParam(defaultValue = "") String query,
+        HttpSession session,
+        Model model
+    ) {
+        Optional<WeillUser> admin = currentAdmin(session);
         if (admin.isEmpty()) {
             return "redirect:/admin/login";
         }
+        AdminDashboardView dashboard = adminEvaluationService.dashboard(query);
         model.addAttribute("admin", admin.get());
+        model.addAttribute("query", query);
+        model.addAttribute("dashboard", dashboard);
         return "admin-dashboard";
+    }
+
+    @GetMapping("/admin/evaluations/{attemptId}")
+    public String evaluation(
+        @PathVariable long attemptId,
+        HttpSession session,
+        Model model
+    ) {
+        if (currentAdmin(session).isEmpty()) {
+            return "redirect:/admin/login";
+        }
+        AdminEvaluationDetail detail = adminEvaluationService.evaluation(attemptId);
+        model.addAttribute("detail", detail);
+        return "admin-evaluation";
     }
 
     @PostMapping("/admin/logout")
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/admin/login";
+    }
+
+    private Optional<WeillUser> currentAdmin(HttpSession session) {
+        return sessionUserService.currentUser(session).filter(WeillUser::isAdmin);
     }
 }
