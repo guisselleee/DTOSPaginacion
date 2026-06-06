@@ -433,6 +433,42 @@ p {
     font-size: 4rem;
 }
 
+.completion-panel {
+    max-width: 720px;
+    margin: 8vh auto 0;
+}
+
+.result-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 24px 0;
+    background: var(--line);
+}
+
+.result-metrics div {
+    min-width: 0;
+    background: var(--panel);
+    padding: 18px;
+}
+
+.result-metrics dt {
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.result-metrics dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
 .response-table-section {
     margin-top: 20px;
 }
@@ -498,6 +534,10 @@ th {
     }
 
     .item-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .result-metrics {
         grid-template-columns: 1fr;
     }
 

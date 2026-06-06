@@ -11,11 +11,32 @@
     <section class="results-summary">
         <p class="eyebrow">Resultado</p>
         <h1 th:text="${result.attempt.user.displayName}">Participante</h1>
-        <p class="score-line">
-            <strong th:text="${result.attempt.totalScore}">0</strong>
-            <span th:text="'/' + ${maxScore} + ' puntos'"></span>
-        </p>
-        <p th:text="${result.answeredItems} + ' respuestas registradas'"></p>
+        <dl class="result-metrics">
+            <div>
+                <dt>Edad</dt>
+                <dd th:text="${psychometric.age} + ' años'">10 años</dd>
+            </div>
+            <div>
+                <dt>Grupo poblacional</dt>
+                <dd th:text="${psychometric.populationCategory.displayName}">Niño</dd>
+            </div>
+            <div>
+                <dt>Aciertos</dt>
+                <dd th:text="${psychometric.correctAnswers} + '/' + ${maxScore}">50/60</dd>
+            </div>
+            <div>
+                <dt>Percentil</dt>
+                <dd th:text="${psychometric.percentile}">90</dd>
+            </div>
+            <div>
+                <dt>Coeficiente intelectual (CI)</dt>
+                <dd th:text="${psychometric.intelligenceQuotient}">119</dd>
+            </div>
+            <div>
+                <dt>Interpretación</dt>
+                <dd th:text="${psychometric.interpretation.displayName}">Buena inteligencia</dd>
+            </div>
+        </dl>
         <a class="secondary-link" href="/">Nueva prueba</a>
     </section>
 

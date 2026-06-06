@@ -75,7 +75,12 @@ public class AttemptService {
         }
         int totalScore = responseRepository.sumScoreByAttemptId(attemptId);
         attempt.complete(totalScore);
-        return new CompleteAttemptResult(attemptId, totalScore, catalog.totalItems(), "/attempts/" + attemptId + "/results");
+        return new CompleteAttemptResult(
+            attemptId,
+            totalScore,
+            catalog.totalItems(),
+            "/attempts/" + attemptId + "/completed"
+        );
     }
 
     @Transactional(readOnly = true)

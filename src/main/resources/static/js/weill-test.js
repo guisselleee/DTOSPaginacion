@@ -248,7 +248,7 @@
         }
         try {
             const result = await postResponses(`/api/attempts/${attemptId}/complete`, Array.from(selections.values()));
-            window.location.assign(result.resultsUrl);
+            window.location.assign(result.confirmationUrl);
         } catch (error) {
             setStatus('No se pudo finalizar. Revisa la conexión e intenta de nuevo.');
         }

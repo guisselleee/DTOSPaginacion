@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evaluación finalizada</title>
+    <link rel="stylesheet" href="/css/weill.css">
+</head>
+<body>
+<main class="start-shell">
+    <section class="start-panel completion-panel">
+        <p class="eyebrow">Evaluación finalizada</p>
+        <h1>Sus respuestas han sido registradas.</h1>
+        <p class="lead-copy">¿Desea ver el resultado?</p>
+        <div class="form-actions">
+            <a class="primary-action"
+               th:href="'/attempts/' + ${attempt.id} + '/results'">Ver resultado</a>
+            <a class="secondary-link" href="/">Volver al inicio</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>
