@@ -5,44 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Registro para el test de Weill</title>
     <link rel="stylesheet" href="/css/weill.css">
+    <script src="/js/register-form.js" defer></script>
 </head>
-<body>
-<main class="start-shell">
-    <section class="start-panel">
+<body class="register-page">
+<main class="register-shell">
+    <section class="register-intro" aria-label="Información del registro">
         <p class="eyebrow">Test de inteligencia de Weill</p>
         <h1>Registro de usuario</h1>
-        <p class="lead-copy">Completa tus datos para crear el acceso al sistema.</p>
+        <p>Completa tus datos para crear tu acceso y comenzar la evaluación con la información correcta.</p>
+        <div class="register-visual" aria-hidden="true"></div>
+    </section>
+
+    <section class="register-panel" aria-label="Formulario de registro">
         <p class="form-error" th:if="${error}" th:text="${error}">Error</p>
+
         <form class="start-form registration-form" method="post" action="/register" th:object="${registration}">
-            <label>
-                Nombre
-                <input th:field="*{name}" type="text" autocomplete="name" required maxlength="160" placeholder="Nombre completo">
-            </label>
-            <label>
-                Email
-                <input th:field="*{email}" type="email" autocomplete="email" required maxlength="254" placeholder="correo@ejemplo.com">
-            </label>
-            <label>
-                Escolaridad
-                <input th:field="*{educationLevel}" type="text" required maxlength="120" placeholder="Grado o nivel educativo">
-            </label>
-            <label>
-                Centro escolar
-                <input th:field="*{schoolCenter}" type="text" required maxlength="180" placeholder="Nombre del centro escolar">
-            </label>
-            <label>
-                Municipio
-                <input th:field="*{municipality}" type="text" required maxlength="120" placeholder="Municipio">
-            </label>
-            <label>
-                Departamento
-                <input th:field="*{department}" type="text" required maxlength="120" placeholder="Departamento">
-            </label>
-            <label>
-                Fecha de nacimiento
-                <input th:field="*{birthDate}" type="date" required>
-            </label>
-            <fieldset class="radio-group">
+            <div class="register-grid">
+                <label>
+                    Nombre
+                    <input th:field="*{name}" type="text" autocomplete="name" required maxlength="160" placeholder="Nombre completo">
+                </label>
+                <label>
+                    Correo electrónico
+                    <input th:field="*{email}" type="email" autocomplete="email" required maxlength="254" placeholder="correo@ejemplo.com">
+                </label>
+            </div>
+
+            <div class="register-grid">
+                <label>
+                    Escolaridad
+                    <select th:field="*{educationLevel}" required>
+                        <option value="">Selecciona una opción</option>
+                        <option value="Primaria">Primaria</option>
+                        <option value="Secundaria">Secundaria</option>
+                        <option value="Bachillerato">Bachillerato</option>
+                        <option value="Técnico">Técnico</option>
+                        <option value="Universidad">Universidad</option>
+                        <option value="Egresado">Egresado</option>
+                        <option value="Graduado universitario">Graduado universitario</option>
+                        <option value="Posgrado">Posgrado</option>
+                        <option value="Sin grado académico">Sin grado académico</option>
+                    </select>
+                </label>
+                <label>
+                    Centro escolar
+                    <input th:field="*{schoolCenter}" type="text" required maxlength="180" placeholder="Nombre del centro escolar">
+                </label>
+            </div>
+
+            <div class="register-grid">
+                <label>
+                    Departamento
+                    <select id="department" th:field="*{department}" required>
+                        <option value="">Selecciona un departamento</option>
+                        <option value="Boaco">Boaco</option>
+                        <option value="Carazo">Carazo</option>
+                        <option value="Chinandega">Chinandega</option>
+                        <option value="Chontales">Chontales</option>
+                        <option value="Estelí">Estelí</option>
+                        <option value="Granada">Granada</option>
+                        <option value="Jinotega">Jinotega</option>
+                        <option value="León">León</option>
+                        <option value="Madriz">Madriz</option>
+                        <option value="Managua">Managua</option>
+                        <option value="Masaya">Masaya</option>
+                        <option value="Matagalpa">Matagalpa</option>
+                        <option value="Nueva Segovia">Nueva Segovia</option>
+                        <option value="Rivas">Rivas</option>
+                        <option value="Río San Juan">Río San Juan</option>
+                        <option value="Región Autónoma de la Costa Caribe Norte">Región Autónoma de la Costa Caribe Norte</option>
+                        <option value="Región Autónoma de la Costa Caribe Sur">Región Autónoma de la Costa Caribe Sur</option>
+                    </select>
+                </label>
+                <label>
+                    Municipio
+                    <input id="municipality"
+                           th:field="*{municipality}"
+                           list="municipality-options"
+                           required
+                           maxlength="120"
+                           autocomplete="address-level2"
+                           placeholder="Escribe o selecciona tu municipio">
+                    <datalist id="municipality-options"></datalist>
+                </label>
+            </div>
+
+            <fieldset class="birthdate-picker">
+                <legend>Fecha de nacimiento</legend>
+                <input id="birthDate" th:field="*{birthDate}" type="hidden">
+                <label>
+                    Día
+                    <select id="birthDay" required>
+                        <option value="">Día</option>
+                    </select>
+                </label>
+                <label>
+                    Mes
+                    <select id="birthMonth" required>
+                        <option value="">Mes</option>
+                    </select>
+                </label>
+                <label>
+                    Año
+                    <select id="birthYear" required>
+                        <option value="">Año</option>
+                    </select>
+                </label>
+            </fieldset>
+
+            <fieldset class="radio-group register-radio">
                 <legend>¿Actualmente estudia?</legend>
                 <label>
                     <input th:field="*{currentlyStudying}" type="radio" value="true" required>
@@ -53,9 +124,11 @@
                     No
                 </label>
             </fieldset>
+
             <button type="submit">Crear registro</button>
         </form>
-        <p class="form-footer">
+
+        <p class="form-footer register-footer">
             ¿Ya tienes registro?
             <a href="/login">Entrar con correo</a>
         </p>

@@ -6,33 +6,52 @@
     <title>Ingresar al test de Weill</title>
     <link rel="stylesheet" href="/css/weill.css">
 </head>
-<body>
-<main class="start-shell">
-    <section class="start-panel">
-        <p class="eyebrow">Test de inteligencia de Weill</p>
-        <h1>Ingreso</h1>
-        <p class="lead-copy">Ingresa con el correo electrónico registrado.</p>
+<body class="login-page">
+<main class="login-shell">
+    <div class="login-mosaic" aria-hidden="true">
+        <figure class="mosaic-tile tile-a"><img src="/images/weill_images/page_5/item_12/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-b"><img src="/images/weill_images/page_2/item_12/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-c"><img src="/images/weill_images/page_1/item_12/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-d"><img src="/images/weill_images/page_3/item_12/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-e"><img src="/images/weill_images/page_4/item_12/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-f"><img src="/images/weill_images/page_1/item_01/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-g"><img src="/images/weill_images/page_2/item_01/main.jpg" alt=""></figure>
+        <figure class="mosaic-tile tile-h"><img src="/images/weill_images/page_3/item_08/main.jpg" alt=""></figure>
+    </div>
+    <section class="login-panel">
+        <div class="login-heading">
+            <p class="eyebrow">Test de inteligencia de Weill</p>
+            <h1>Ingreso</h1>
+            <p class="lead-copy">Ingresa con el correo electrónico registrado.</p>
+        </div>
+
         <p class="form-error" th:if="${error}" th:text="${error}">Error</p>
-        <form class="start-form" method="post" action="/login">
-            <label>
-                Correo electrónico
-                <input name="email"
+
+        <form class="start-form login-form" method="post" action="/login">
+            <label for="login-email">Correo electrónico</label>
+            <div class="login-input">
+                <span aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false">
+                        <path d="M4 6h16v12H4z"></path>
+                        <path d="m4 7 8 6 8-6"></path>
+                    </svg>
+                </span>
+                <input id="login-email"
+                       name="email"
                        type="email"
                        autocomplete="email"
                        required
                        maxlength="254"
                        placeholder="correo@ejemplo.com"
                        th:value="${email}">
-            </label>
+            </div>
             <button type="submit">Entrar</button>
         </form>
-        <p class="form-footer">
-            ¿Nuevo usuario?
-            <a href="/register">Crear registro</a>
-        </p>
-        <p class="form-footer">
+
+        <div class="login-links">
+            <p>¿Nuevo usuario? <a href="/register">Crear registro</a></p>
             <a href="/admin/login">Acceso institucional</a>
-        </p>
+        </div>
     </section>
 </main>
 </body>
